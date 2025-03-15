@@ -10,7 +10,7 @@ public class WeaponBase : MonoBehaviour
     {
         GameObject spawnedBullet = Instantiate(bullet, transform.position, transform.rotation);
         spawnedBullet.GetComponent<HandGunBullet>().fireFromVector = transform.position;
-        spawnedBullet.GetComponent<HandGunBullet>().fireFromObject = transform.parent.parent.gameObject;
+        spawnedBullet.GetComponent<HandGunBullet>().fireFromObjectTag = transform.parent.parent.tag;
         fireCoolTime = 0;
     }
 }

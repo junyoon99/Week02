@@ -4,7 +4,7 @@ using UnityEngine;
 public class HandGunBullet : MonoBehaviour
 {
     public Vector3 fireFromVector;
-    public GameObject fireFromObject;
+    public string fireFromObjectTag;
     float moveSpeed = 100f;
     Rigidbody2D rb;
     GameObject bulletLine;
@@ -34,28 +34,40 @@ public class HandGunBullet : MonoBehaviour
         currentPos = transform.position;
 
         RaycastHit2D hit = Physics2D.Raycast(beforePos, (currentPos - beforePos).normalized, Vector2.Distance(beforePos, currentPos));
-        if (hit && hit.collider.gameObject != fireFromObject)
+        if (hit &&  hit.collider.tag != fireFromObjectTag)
         {
+            hit.collider.TryGetComponent<PlayerState>(out PlayerState playerState);
+            if (playerState != null && ((playerState.currentState & PlayerState.playerState.roll) == PlayerState.playerState.roll)) return;
+
             transform.position = new Vector3(hit.point.x, hit.point.y, transform.position.z);
             currentPos = transform.position;
             switch (hit.collider.tag)
             {
                 case "Player":
+                    Destroy(gameObject);
                     break;
+
                 case "AttackEffect":
                     Debug.Log("นÝป็!");
+                    hit.collider.transform.parent.GetComponent<PlayerInputScript>().AttackEnd();
+
                     Vector2 reflectDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
                     float angle = Mathf.Atan2(reflectDirection.y, reflectDirection.x) * Mathf.Rad2Deg;
                     transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
                     rb.linearVelocity = Vector2.zero;
                     rb.angularVelocity = 0f;
                     moveSpeed *= 2f;
-                    fireFromObject = hit.collider.gameObject;
+                    fireFromObjectTag = hit.collider.tag;
                     bulletLine.GetComponent<BulletLineScript>().addPoint();
                     break;
+
                 case "Enemy":
-                    hit.collider.GetComponent<Enemy_1>().TakeDamageAction();
+                    hit.collider.GetComponent<EnemyBase>().TakeDamageAction();
                     HitStop.Instance.Stop(0.3f);
+                    Destroy(gameObject);
+                    break;
+
+                case "Obstacle":
                     Destroy(gameObject);
                     break;
             }
