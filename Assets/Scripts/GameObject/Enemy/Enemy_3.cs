@@ -17,11 +17,11 @@ public class Enemy_3 : EnemyBase
 
 	void Update()
 	{
-		if (player)
+		if (player && currentState == State.idle)
 		{
 			currentState = State.foundPlayer;
 		}
-		else
+		else if(!player)
 		{
 			currentState = State.idle;
 		}
@@ -47,24 +47,42 @@ public class Enemy_3 : EnemyBase
 		Debug.Log("돌진준비");
         isAttacking = true;
         moveSpeed = 0;
+        // 락온
         yield return new WaitForSeconds(0.5f);
         Vector2 rushDirection = (player.transform.position - transform.position).normalized;
-        yield return new WaitForSeconds(0.5f);
+        currentState = State.attack;
+        // 돌진선딜 후 돌진
+        yield return new WaitForSeconds(0.15f);
         Debug.Log("돌진");
         GetComponent<SpriteRenderer>().color = Color.blue; //돌진상태표시
-        rb.linearDamping = 0f;
-		rb.AddForce(rushDirection * 500, ForceMode2D.Impulse);
-        yield return new WaitForSeconds(0.3f);
-		rb.linearDamping = 10f;
+		rb.AddForce(rushDirection * 1000, ForceMode2D.Impulse);
+        float timer = 0.3f;
+        // 돌진동안 플레이어와 충돌체크
+        while (timer > 0)
+        {
+            timer -= Time.deltaTime;
+            Collider2D myCollider = GetComponent<Collider2D>();
+            Collider2D playerCollider = player.GetComponent<Collider2D>();
+            if (myCollider.IsTouching(playerCollider)) 
+            {
+                Debug.Log("플레이어 닿음");
+                player.GetComponent<PlayerInputScript>().AttackBlocked(transform, 1f);
+                player.GetComponent<PlayerInputScript>().TakeDamage();
+                Block();
+            }
+            yield return null;
+        }
 		GetComponent<SpriteRenderer>().color = Color.yellow;
         isBlock = false;
+        currentState = State.stuned;
         yield return new WaitForSeconds(2f);
-        Debug.Log("쿨타임끝");
+        //Debug.Log("쿨타임끝");
 		AttackEnd();
     }
 
 	void AttackEnd() 
 	{
+        currentState = State.idle;
         isBlock = true;
         GetComponent<SpriteRenderer>().color = c;
         moveSpeed = 10f;
@@ -78,12 +96,13 @@ public class Enemy_3 : EnemyBase
             StopCoroutine(attackSkill);
 			attackSkill = null;
         }
-        
+        Instantiate(Resources.Load<GameObject>("Prefabs/Particles/BloodParticle"), transform.position, Quaternion.identity);
+        player.GetComponent<PlayerInputScript>().killCount++;
         Destroy(gameObject);
     }
 	public override void Block()
 	{
-		StartCoroutine(KnockBack(player.transform,500f,1f));
+		StartCoroutine(KnockBack(player.transform,400f,1f));
     }
 
 	IEnumerator KnockBack(Transform target, float force, float stunTime)
@@ -98,7 +117,7 @@ public class Enemy_3 : EnemyBase
         rb.AddForce((transform.position - target.position).normalized * force, ForceMode2D.Impulse);
         while (stunTime >= 0)
         {
-			Debug.Log("남은 스턴시간 : " + stunTime);
+			//Debug.Log("남은 스턴시간 : " + stunTime);
             canMove = false;
             stunTime -= Time.deltaTime;
             yield return null;

@@ -20,7 +20,7 @@ public class HitStop : MonoBehaviour
         {
             return;
         }
-        Debug.Log("더 월드!");
+        //Debug.Log("더 월드!");
         timeScale = Time.timeScale;
         Time.timeScale = 0.0f;
         StartCoroutine(Wait(duration));
@@ -30,7 +30,7 @@ public class HitStop : MonoBehaviour
     {
         waiting = true;
         yield return new WaitForSecondsRealtime(duration);
-        Debug.Log("시간은 다시 움직인다!");
+        //Debug.Log("시간은 다시 움직인다!");
         Time.timeScale = timeScale;
         waiting = false;
     }

@@ -13,11 +13,11 @@ public class Enemy_2 : EnemyBase
     void Update()
     {
         timer += Time.deltaTime;
-        if (player)
+        if (player && currentState == State.idle)
         {
             currentState = State.foundPlayer;
         }
-        else
+        else if(!player)
         {
             currentState = State.idle;
         }
@@ -25,7 +25,7 @@ public class Enemy_2 : EnemyBase
         {
             timer = 0;
             Vector2 randomPosition;
-            if (player)
+            if (currentState == State.foundPlayer)
             {
                 randomPosition = RandomPosition(player.transform.position);
                 //while (Physics2D.OverlapCircle(randomPosition, 1f) != null)
@@ -64,5 +64,7 @@ public class Enemy_2 : EnemyBase
     public override void TakeDamageAction()
     {
         Destroy(gameObject);
+        Instantiate(Resources.Load<GameObject>("Prefabs/Particles/BloodParticle"), transform.position, Quaternion.identity);
+        player.GetComponent<PlayerInputScript>().killCount++;
     }
 }

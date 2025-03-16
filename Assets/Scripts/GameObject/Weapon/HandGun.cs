@@ -5,7 +5,7 @@ public class HandGun : WeaponBase
     private void OnEnable()
     {
         bullet = Resources.Load<GameObject>("Prefabs/Bullets/HandGunBullet");
-        fireRate = 1f;
+        fireRate = 1.5f;
     }
 
     void Update()

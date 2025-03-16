@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class WeaponBase : MonoBehaviour
 {
-    protected float fireRate;
+    public float fireRate;
     public float fireCoolTime = 0;
     protected GameObject bullet;
 

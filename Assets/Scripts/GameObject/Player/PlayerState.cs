@@ -11,13 +11,4 @@ public class PlayerState : MonoBehaviour
         roll = 1 << 4
     }
     public playerState currentState;
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
 }

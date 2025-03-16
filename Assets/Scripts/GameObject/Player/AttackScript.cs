@@ -11,7 +11,7 @@ public class AttackScript : MonoBehaviour
             collision.TryGetComponent<EnemyBase>(out EnemyBase enemy);
             if (enemy.canDead && !enemy.isBlock)
             {
-                HitStop.Instance.Stop(0.3f);
+                //HitStop.Instance.Stop(0.1f);
                 enemy.TakeDamageAction();
             }
             else if (enemy.isBlock)

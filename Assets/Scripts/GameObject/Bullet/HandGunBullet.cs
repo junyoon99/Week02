@@ -39,8 +39,6 @@ public class HandGunBullet : MonoBehaviour
             hit.collider.TryGetComponent<PlayerState>(out PlayerState playerState);
             if (playerState != null && ((playerState.currentState & PlayerState.playerState.roll) == PlayerState.playerState.roll)) return;
 
-            transform.position = new Vector3(hit.point.x, hit.point.y, transform.position.z);
-            currentPos = transform.position;
             switch (hit.collider.tag)
             {
                 case "Player":
@@ -49,6 +47,8 @@ public class HandGunBullet : MonoBehaviour
 
                 case "AttackEffect":
                     Debug.Log("นÝป็!");
+                    transform.position = new Vector3(hit.point.x, hit.point.y, transform.position.z);
+
                     hit.collider.transform.parent.GetComponent<PlayerInputScript>().AttackEnd();
 
                     Vector2 reflectDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
@@ -63,14 +63,18 @@ public class HandGunBullet : MonoBehaviour
 
                 case "Enemy":
                     hit.collider.GetComponent<EnemyBase>().TakeDamageAction();
-                    HitStop.Instance.Stop(0.3f);
+                    //HitStop.Instance.Stop(0.1f);
                     Destroy(gameObject);
                     break;
 
                 case "Obstacle":
                     Destroy(gameObject);
                     break;
+
+                default:
+                    break;
             }
+            currentPos = transform.position;
         }
 
         bulletLine.transform.position = currentPos;

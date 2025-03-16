@@ -13,7 +13,8 @@ public class EnemyBase : MonoBehaviour
     {
         idle = 0,
         foundPlayer = 1 << 1,
-        stuned = 1 << 2
+        stuned = 1 << 2,
+        attack = 1 << 3
     }
     public State currentState;
 
