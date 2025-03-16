@@ -44,5 +44,14 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: particles
+    uniqueID: 1197438813
+    locked: 0
+  - name: Enemy
+    uniqueID: 3577710749
+    locked: 0
+  - name: 'Player '
+    uniqueID: 3336653531
+    locked: 0
   m_RenderingLayers:
   - Default
