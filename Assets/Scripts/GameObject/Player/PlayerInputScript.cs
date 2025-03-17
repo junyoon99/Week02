@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
@@ -58,25 +59,25 @@ public class PlayerInputScript : MonoBehaviour
 	Coroutine attacking;
     float ChangeAngle(float angle)
     {
-        if (angle < 0) angle += 360;
+        //if (angle < 0) angle += 360;
 
-        if ((angle >= 0 && angle < 45f) || (angle >= 360 - 45 && angle < 360))
-        {
-            angle = 0;
-        }
-        else if (angle >= 45 && angle < 135)
-        {
-            angle = 90;
-        }
-        else if (angle >= 135 && angle < 225)
-        {
-            angle = 180;
-        }
-        else if (angle >= 225 && angle < 360)
-        {
-            angle = 270;
-        }
-        angle += 90;
+        //if ((angle >= 0 && angle < 45f) || (angle >= 360 - 45 && angle < 360))
+        //{
+        //    angle = 0;
+        //}
+        //else if (angle >= 45 && angle < 135)
+        //{
+        //    angle = 90;
+        //}
+        //else if (angle >= 135 && angle < 225)
+        //{
+        //    angle = 180;
+        //}
+        //else if (angle >= 225 && angle < 360)
+        //{
+        //    angle = 270;
+        //}
+        //angle += 90;
 
         return angle;
     }
@@ -269,6 +270,7 @@ public class PlayerInputScript : MonoBehaviour
                 Debug.Log("이동중!");
                 GameObject afterImage = new GameObject("AfterImage");
                 afterImage.AddComponent<SpriteRenderer>().sprite = GetComponent<SpriteRenderer>().sprite;
+                afterImage.AddComponent<SortingGroup>().sortingLayerName = "Player";
                 afterImage.AddComponent<AfterImage>();
                 afterImage.transform.position = pos;
             }
@@ -353,7 +355,7 @@ public class PlayerInputScript : MonoBehaviour
     IEnumerator Rolling()
     {
         // 구르는중
-        float timer = 0.5f;
+        float timer = 0.25f;
         while (timer > 0f)
         {
             if (hasState(PlayerState.playerState.attack)) break;
@@ -453,6 +455,7 @@ public class PlayerInputScript : MonoBehaviour
     {
         GetComponent<SpriteRenderer>().color = Color.blue;
         rigidbody2d.linearDamping = 0.5f;
+        rigidbody2d.freezeRotation = false;
         _inputActionMap.Disable();
         StopAllCoroutines();
         this.enabled = false;

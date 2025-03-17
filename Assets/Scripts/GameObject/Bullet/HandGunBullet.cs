@@ -5,7 +5,7 @@ public class HandGunBullet : MonoBehaviour
 {
     public Vector3 fireFromVector;
     public string fireFromObjectTag;
-    float moveSpeed = 100f;
+    float moveSpeed = 50f;
     Rigidbody2D rb;
     GameObject bulletLine;
 

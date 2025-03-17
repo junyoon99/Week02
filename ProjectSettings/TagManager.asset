@@ -44,14 +44,29 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Elevator
+    uniqueID: 1357996867
+    locked: 0
+  - name: Ground
+    uniqueID: 3717635421
+    locked: 0
   - name: particles
     uniqueID: 1197438813
+    locked: 0
+  - name: Wall
+    uniqueID: 2348280597
+    locked: 0
+  - name: DarkEffect
+    uniqueID: 219410103
     locked: 0
   - name: Enemy
     uniqueID: 3577710749
     locked: 0
-  - name: 'Player '
+  - name: Player
     uniqueID: 3336653531
+    locked: 0
+  - name: FakeWall
+    uniqueID: 288189949
     locked: 0
   m_RenderingLayers:
   - Default

@@ -4,7 +4,6 @@ public class AfterImage : MonoBehaviour
 {
     SpriteRenderer sprite;
     Color color;
-    float deleteTIme = 2f;
     float currTime = 0;
     void Start()
     {
@@ -16,9 +15,9 @@ public class AfterImage : MonoBehaviour
     void Update()
     {
         currTime += Time.deltaTime;
-        color.a -= 1 / 255f;
+        color.a -= Time.deltaTime;
         sprite.color = color;
-        if (deleteTIme < currTime)
+        if (sprite.color.a <= 0)
         {
             Destroy(gameObject);
         }
