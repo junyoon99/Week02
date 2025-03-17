@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6956475734452663613}
   - component: {fileID: 612729707237910620}
   - component: {fileID: 916471967629915974}
+  - component: {fileID: 8586534523748149426}
   m_Layer: 0
   m_Name: HandGun
   m_TagString: Untagged
@@ -102,6 +103,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fireRate: 0
   fireCoolTime: 0
+--- !u!210 &8586534523748149426
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2285833572222634746}
+  m_Enabled: 1
+  m_SortingLayerID: -717256547
+  m_SortingLayer: 7
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
 --- !u!1 &2564375164825563561
 GameObject:
   m_ObjectHideFlags: 0
@@ -182,10 +195,10 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -717256547
-  m_SortingLayer: 2
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 0.18431371, g: 1, b: 0.40777397, a: 1}
+  m_Color: {r: 0.15686275, g: 0.37311542, b: 0.5882353, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -325,6 +338,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5276854084118263479}
+  - component: {fileID: 7889364591738263841}
   m_Layer: 0
   m_Name: Weapon
   m_TagString: Untagged
@@ -348,6 +362,18 @@ Transform:
   - {fileID: 6956475734452663613}
   m_Father: {fileID: 1620294541164984416}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!210 &7889364591738263841
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8277005885147438565}
+  m_Enabled: 1
+  m_SortingLayerID: -717256547
+  m_SortingLayer: 7
+  m_SortingOrder: 1
+  m_SortAtRoot: 0
 --- !u!1001 &5243182535704454692
 PrefabInstance:
   m_ObjectHideFlags: 0

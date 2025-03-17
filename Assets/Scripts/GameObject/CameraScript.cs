@@ -16,7 +16,7 @@ public class CameraScript : MonoBehaviour
     Vector3 playerPos;
     Vector3 posDiff;
     Vector3 targetPos;
-    void FixedUpdate()
+    void LateUpdate()
     {
         //if (player)
         //{

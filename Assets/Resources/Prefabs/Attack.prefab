@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7514190438843853041}
   - component: {fileID: 6123981878165491739}
   - component: {fileID: 2741550646081424181}
+  - component: {fileID: 7054899852332842620}
   m_Layer: 0
   m_Name: Attack
   m_TagString: AttackEffect
@@ -69,7 +70,7 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: -1}
-  m_Size: {x: 2.5, y: 2}
+  m_Size: {x: 3, y: 2.5}
   m_Direction: 1
 --- !u!114 &2741550646081424181
 MonoBehaviour:
@@ -84,6 +85,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+--- !u!210 &7054899852332842620
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8087506428792073388}
+  m_Enabled: 1
+  m_SortingLayerID: -958313765
+  m_SortingLayer: 8
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
 --- !u!1 &9044697631005022211
 GameObject:
   m_ObjectHideFlags: 0
@@ -111,7 +124,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -1, z: 0}
-  m_LocalScale: {x: 2.5, y: 2, z: 1}
+  m_LocalScale: {x: 3, y: 2.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7514190438843853041}

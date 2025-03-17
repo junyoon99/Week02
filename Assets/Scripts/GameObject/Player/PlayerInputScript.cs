@@ -16,19 +16,25 @@ public class PlayerInputScript : MonoBehaviour
     public PlayerCanvas playerCanvas;
 
 	public InputActionAsset inputActionAsset;
-	InputActionMap _inputActionMap;
+	public InputActionMap _inputActionMap;
 
 	PlayerState playerState;
-
+    public float bulletTimeMax;
+    public float currentLeftBulletTime;
 	//임시
 	Color c;
 
-	private void OnEnable()
+	private void Start()
 	{
+        bulletTimeMax = 0.2f;
+        currentLeftBulletTime = bulletTimeMax;
+
 		rigidbody2d = GetComponent<Rigidbody2D>();
-		moveSpeed = 15f;
+		moveSpeed = 20f;
+
 		playerState = GetComponent<PlayerState>();
         playerCanvas = GetComponent<PlayerCanvas>();
+        inputActionAsset = Resources.Load<InputActionAsset>("PlayerControls");
 
         _inputActionMap = inputActionAsset.FindActionMap("Player");
 		_inputActionMap.FindAction("Attack").started += Attack;
@@ -51,7 +57,22 @@ public class PlayerInputScript : MonoBehaviour
     }
 	private void Update()
 	{
-        DrawSkillBar();
+        if ((playerState.currentState & PlayerState.playerState.charge) != PlayerState.playerState.charge) 
+        {
+            DrawSkillBar();
+        }
+        if(isDead) GetComponent<SpriteRenderer>().color = Color.gray;
+
+        if (isBulletTime)
+        {
+            currentLeftBulletTime -= Time.deltaTime;
+        }
+        else 
+        {
+            currentLeftBulletTime += Time.deltaTime / 30;
+        }
+        currentLeftBulletTime = Mathf.Clamp(currentLeftBulletTime, 0, bulletTimeMax);
+        if(currentLeftBulletTime == 0) BulletTimeOff();
     }
 
 	//-----------------------------------------------------------------------------------------------
@@ -101,14 +122,13 @@ public class PlayerInputScript : MonoBehaviour
         attackIMG = Resources.Load<GameObject>("Prefabs/Attack");
         attackIMG = Instantiate(attackIMG, transform);
 		attackIMG.GetComponent<AttackScript>().player = gameObject;
-        GetComponent<SpriteRenderer>().color = c;
         // 오브젝트 각도별 행동 바꾸기
         Vector2 advanceDirection = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position).normalized;
         float angle = Mathf.Atan2(advanceDirection.y, advanceDirection.x) * Mathf.Rad2Deg;
-		angle = ChangeAngle(angle);
-        transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        angle = ChangeAngle(angle);
+        attackIMG.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 90));
         // 마우스 방향으로 힘부여
-        float force = 50f;
+        float force = 60f;
         rigidbody2d.AddForce(advanceDirection * force, ForceMode2D.Impulse);
         yield return new WaitForSeconds(0.15f);
         //공격상태 끝
@@ -165,26 +185,37 @@ public class PlayerInputScript : MonoBehaviour
 	void ChargeStart()
     {
 		Debug.Log("차지시작!");
+        BulletTimeOn();
         playerState.currentState |= PlayerState.playerState.charge;
 		if (charging == null)
 		{
             charging = StartCoroutine(Charging());
         }
     }
+
 	IEnumerator Charging()
 	{
         bool useBulletTime = false;
-        while (_inputActionMap.FindAction("Attack").IsPressed())
-		{
-			chargeTime += Time.deltaTime;
-			yield return null;
-            if (!useBulletTime && chargeTime > 0.3f) 
+
+        if (_inputActionMap != null) 
+        {
+            while (_inputActionMap.FindAction("Attack").IsPressed())
             {
-                useBulletTime = true;
-                BulletTimeOn();
+                Transform fill = playerCanvas.skillBar.transform.Find("Fill");
+
+                chargeTime += 0.02f;
+                chargeTime = Mathf.Clamp(chargeTime, 0f, 0.2f);
+                float fillx = fill.localScale.x;
+                fillx = (0.2f - chargeTime) / 0.2f;
+                fill.localScale = new Vector3(fillx, fill.localScale.y, fill.localScale.z);
+                yield return new WaitForSecondsRealtime(0.01f);
+                if (!useBulletTime && chargeTime >= 0.2f)
+                {
+                    useBulletTime = true;
+                }
             }
-		}
-		ChargeEnd();
+            ChargeEnd();
+        }
     }
     void ChargeEnd()
 	{
@@ -196,19 +227,19 @@ public class PlayerInputScript : MonoBehaviour
             StopCoroutine(charging);
             charging = null;
         }
-        if (chargeTime > 0.2f)
+        if (chargeTime >= 0.2f)
         {
             Debug.Log("차지성공!");
             killCount = 0;
             // 각도를 마우스 방향
             Vector2 goalPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 advanceDirection = (goalPos - (Vector2)transform.position);
-            float angle = Mathf.Atan2(advanceDirection.y, advanceDirection.x) * Mathf.Rad2Deg;
-            angle = ChangeAngle(angle);
-            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+            //float angle = Mathf.Atan2(advanceDirection.y, advanceDirection.x) * Mathf.Rad2Deg;
+            //angle = ChangeAngle(angle);
+            //transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
 
             //레이캐스트방향으로 적들에게 데미지
-            RaycastHit2D[] Hits = Physics2D.CircleCastAll(transform.position, 1.5f, advanceDirection.normalized, Vector2.Distance(goalPos, transform.position));
+            RaycastHit2D[] Hits = Physics2D.CircleCastAll(transform.position, 1f, advanceDirection.normalized, Vector2.Distance(goalPos, transform.position));
             Transform iswall = null;
             foreach (RaycastHit2D hit in Hits)
             {
@@ -230,7 +261,7 @@ public class PlayerInputScript : MonoBehaviour
                         break;
                     case "Obstacle":
                         Debug.Log("장애물!");
-                        goalPos = hit.point;
+                        goalPos = hit.point - advanceDirection.normalized;
                         advanceDirection = (goalPos - (Vector2)transform.position);
                         iswall = hit.transform;
                         break;
@@ -245,7 +276,7 @@ public class PlayerInputScript : MonoBehaviour
             transform.position = (Vector2)goalPos;
             if (iswall) //벽이면 벽반대방향으로
             {
-                AttackBlocked(iswall, 0.5f);
+                AttackBlocked(iswall, 0.2f);
             }
             else 
             {
@@ -278,8 +309,10 @@ public class PlayerInputScript : MonoBehaviour
         else 
 		{
 			Debug.Log("차지실패!");
-        }
+            Transform fill = playerCanvas.skillBar.transform.Find("Fill");
 
+            fill.localScale = new Vector3(1, fill.localScale.y, fill.localScale.z);
+        }
 		chargeTime = 0f;
     }
     //-----------------------------------------------------------------------------------------------
@@ -294,7 +327,7 @@ public class PlayerInputScript : MonoBehaviour
     }
 	IEnumerator Moving() 
 	{
-		while (true) 
+		while (true)
 		{
 			if (playerState.currentState == PlayerState.playerState.Idle || playerState.currentState == PlayerState.playerState.move) 
 			{
@@ -303,8 +336,8 @@ public class PlayerInputScript : MonoBehaviour
 				if (_moveDirection != Vector2.zero) 
 				{
                     // rotation
-                    float angle = Mathf.Atan2(_moveDirection.y, _moveDirection.x) * Mathf.Rad2Deg + 90;
-                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+                    //float angle = Mathf.Atan2(_moveDirection.y, _moveDirection.x) * Mathf.Rad2Deg + 90;
+                    //transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
                     // transform
                     rigidbody2d.linearVelocity = _moveDirection * moveSpeed;
                 }
@@ -355,7 +388,7 @@ public class PlayerInputScript : MonoBehaviour
     IEnumerator Rolling()
     {
         // 구르는중
-        float timer = 0.25f;
+        float timer = 0.3f;
         while (timer > 0f)
         {
             if (hasState(PlayerState.playerState.attack)) break;
@@ -381,12 +414,17 @@ public class PlayerInputScript : MonoBehaviour
 	BackGroundScript backGroundScript;
 	SpriteRenderer darkEffect;
 	Coroutine bulletTime;
+    bool isBulletTime = false;
     void UseBulletTime(InputAction.CallbackContext ctx) 
     {
-        BulletTimeOn();
+        if (currentLeftBulletTime > 0.1f) 
+        {
+            BulletTimeOn();
+        }
     }
-	void BulletTimeOn() 
+	public void BulletTimeOn() 
 	{
+        isBulletTime = true;
 		Time.timeScale = 0.2f;
 		HitStop.Instance.timeScale = Time.timeScale;
 		Time.fixedDeltaTime = 0.02f * Time.timeScale;
@@ -397,6 +435,7 @@ public class PlayerInputScript : MonoBehaviour
 		}
 		bulletTime = StartCoroutine(darkEffectOn());
 	}
+
 	IEnumerator darkEffectOn() 
 	{
 		Color c = darkEffect.color;
@@ -414,8 +453,9 @@ public class PlayerInputScript : MonoBehaviour
     {
         BulletTimeOff();
     }
-	void BulletTimeOff() 
+	public void BulletTimeOff() 
 	{
+        isBulletTime = false;
 		Time.timeScale = 1f;
 		HitStop.Instance.timeScale = Time.timeScale;
 		Time.fixedDeltaTime = 0.02f * Time.timeScale;
@@ -451,19 +491,43 @@ public class PlayerInputScript : MonoBehaviour
 			return false;
 		}
 	}
-    public void TakeDamage() 
+    public bool isDead = false;
+    public void TakeDamage()
     {
-        GetComponent<SpriteRenderer>().color = Color.blue;
-        rigidbody2d.linearDamping = 0.5f;
-        rigidbody2d.freezeRotation = false;
-        _inputActionMap.Disable();
-        StopAllCoroutines();
-        this.enabled = false;
+        if (!isDead) {
+            isDead = true;
+            HitStop.Instance.Stop(0.3f);
+            Debug.Log("주금");
+            GetComponent<SpriteRenderer>().color = Color.blue;
+            rigidbody2d.linearDamping = 1f;
+            rigidbody2d.freezeRotation = false;
+            StopAllCoroutines();
+            StopAction();
+            inputActionAsset.Disable();
+            _inputActionMap.Disable(); // 명시적 비활성화
+            moving = null; // 코루틴 상태 초기화
+            attacking = null;
+            rolling = null;
+            charging = null;
+            bulletTime = null;
+            Instantiate(Resources.Load<GameObject>("Prefabs/Particles/BloodParticle"), transform.position, Quaternion.identity);
+        }
     }
 
     public void DrawSkillBar()
     {
         killCount = Mathf.Clamp(killCount, 0, SkillCoolKillCount);
         playerCanvas.skillBar.Find("Fill").localScale = new Vector3(killCount / SkillCoolKillCount, 1, 1);
+    }
+
+    public void StopAction() 
+    {
+        _inputActionMap.FindAction("Attack").started -= Attack;
+        _inputActionMap.FindAction("Attack").started -= ChargeAttack;
+        _inputActionMap.FindAction("Move").started -= Move;
+        _inputActionMap.FindAction("Move").canceled -= MoveKeyUp;
+        _inputActionMap.FindAction("Roll").started -= Roll;
+        _inputActionMap.FindAction("BulletTime").started -= UseBulletTime;
+        _inputActionMap.FindAction("BulletTime").canceled -= CancleBulletTime;
     }
 }

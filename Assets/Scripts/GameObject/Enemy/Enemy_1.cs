@@ -56,6 +56,7 @@ public class Enemy_1 : EnemyBase
 	{
 		Destroy(gameObject);
         Instantiate(Resources.Load<GameObject>("Prefabs/Particles/BloodParticle"), transform.position, Quaternion.identity);
-        player.GetComponent<PlayerInputScript>().killCount++;
+		if(player)player.GetComponent<PlayerInputScript>().killCount++;
+		GameManager.score++;
     }
 }

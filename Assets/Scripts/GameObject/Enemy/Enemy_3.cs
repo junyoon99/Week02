@@ -97,7 +97,8 @@ public class Enemy_3 : EnemyBase
 			attackSkill = null;
         }
         Instantiate(Resources.Load<GameObject>("Prefabs/Particles/BloodParticle"), transform.position, Quaternion.identity);
-        player.GetComponent<PlayerInputScript>().killCount++;
+        if(player)player.GetComponent<PlayerInputScript>().killCount++;
+        GameManager.score++;
         Destroy(gameObject);
     }
 	public override void Block()

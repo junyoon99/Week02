@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SpawnManager : MonoBehaviour
 {
 	GameObject player;
 	public List<GameObject> enemies;
 	GameObject cam;
+	GameObject Elevator;
 
 	private void Awake()
 	{
@@ -17,26 +19,52 @@ public class SpawnManager : MonoBehaviour
 			enemies.Add(Resources.Load<GameObject>("Prefabs/Enemies/Enemy_" + i.ToString()));
 		}
 		cam = Resources.Load<GameObject>("Prefabs/MainCamera");
+        Elevator = Resources.Load<GameObject>("Prefabs/ElevatorParent");
     }
 	void Start()
 	{
-		player = Instantiate(player);
-		for (int i = 0; i < 4; i++)
-		{
-			GameObject spawnedEnemy1 = Instantiate(enemies[0], new Vector3(2, 0, 0), Quaternion.Euler(Vector3.zero));
-			spawnedEnemy1.TryGetComponent<EnemyBase>(out EnemyBase enemyBase);
-			enemyBase.player = player;
-		}
+        //엘베와 플레이어 소환
+        player = Instantiate(player);
+        Elevator = Instantiate(Elevator, new Vector2(0,30), Quaternion.identity).transform.GetChild(0).gameObject;
+		Elevator.GetComponent<Elevato>().isStart = true;
+		player.transform.SetParent(Elevator.transform);
+		player.transform.localPosition = new Vector3(0, 0, 0);
 
-		GameObject spawnedEnemy2 = Instantiate(enemies[1], new Vector3(10, 0, 0), Quaternion.Euler(Vector3.zero));
-		spawnedEnemy2.TryGetComponent<EnemyBase>(out EnemyBase enemyBase2);
-		enemyBase2.player = player;
+        string currentScene = SceneManager.GetActiveScene().name;
+        if (currentScene != "LobbyScene")
+        {
+            // 몹 소환
+            int score = GameManager.score;
+			int bigEnemyStack = 0;
+            while (score > 0)
+            {
+                int randomEnemy = score - 1;
+                randomEnemy = Mathf.Clamp(randomEnemy, 0, 2);
+                randomEnemy = Random.Range(0, randomEnemy + 1);
+                score -= randomEnemy + 1;
 
-		GameObject spawnedEnemy3 = Instantiate(enemies[2], new Vector3(10, 0, 0), Quaternion.Euler(Vector3.zero));
-		spawnedEnemy3.TryGetComponent<EnemyBase>(out EnemyBase enemyBase3);
-		enemyBase3.player = player;
+                if (randomEnemy == 2) 
+				{
+					bigEnemyStack++;
+					if (bigEnemyStack < 2)
+					{
+						continue;
+					}
+					else 
+					{
+						bigEnemyStack = 0;
+					}
+				}
+                Instantiate(enemies[randomEnemy], RandomPos(), Quaternion.identity);
+            }
+        }
 
-		cam = Instantiate(cam);
+        cam = Instantiate(cam);
         cam.GetComponent<CameraScript>().player = player;
     }
+
+	Vector2 RandomPos() 
+	{
+		return new Vector2(Random.Range(-20, 20), Random.Range(-14, 15));
+	}
 }

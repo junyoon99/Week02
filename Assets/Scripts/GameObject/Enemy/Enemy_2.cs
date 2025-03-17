@@ -5,7 +5,7 @@ public class Enemy_2 : EnemyBase
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        moveSpeed = 45f;
+        moveSpeed = 10f + GameManager.score/3;
     }
     public Vector3 goalPosition;
     float randomRange = 15f;
@@ -65,6 +65,16 @@ public class Enemy_2 : EnemyBase
     {
         Destroy(gameObject);
         Instantiate(Resources.Load<GameObject>("Prefabs/Particles/BloodParticle"), transform.position, Quaternion.identity);
-        player.GetComponent<PlayerInputScript>().killCount++;
+        if(player)player.GetComponent<PlayerInputScript>().killCount++;
+        GameManager.score++;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.tag == "Player") 
+        {
+            collision.collider.GetComponent<PlayerInputScript>().TakeDamage();
+            collision.collider.GetComponent<Rigidbody2D>().AddForce((collision.transform.position - transform.position) * 50f);
+        }
     }
 }

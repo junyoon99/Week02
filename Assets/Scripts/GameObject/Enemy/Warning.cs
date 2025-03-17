@@ -20,14 +20,14 @@ public class Warning : MonoBehaviour
 			switch (currentState)
 			{
 				case EnemyBase.State.idle:
-					warningText.text = "";
+					warningText.text = "...";
 					break;
 				case EnemyBase.State.foundPlayer:
 					warningText.text = "!";
 					warningText.color = Color.white;
 					break;
 				case EnemyBase.State.stuned:
-					warningText.text = "X";
+					warningText.text = "";
 					warningText.color = Color.white;
 					break;
 				case EnemyBase.State.attack:

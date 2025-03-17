@@ -5,7 +5,7 @@ public class HandGunBullet : MonoBehaviour
 {
     public Vector3 fireFromVector;
     public string fireFromObjectTag;
-    float moveSpeed = 50f;
+    float moveSpeed = 35f;
     Rigidbody2D rb;
     GameObject bulletLine;
 
@@ -42,6 +42,8 @@ public class HandGunBullet : MonoBehaviour
             switch (hit.collider.tag)
             {
                 case "Player":
+                    hit.collider.GetComponent<PlayerInputScript>().TakeDamage();
+                    hit.collider.GetComponent<Rigidbody2D>().AddForce((hit.collider.transform.position - transform.position) *50f, ForceMode2D.Impulse);
                     Destroy(gameObject);
                     break;
 
@@ -59,11 +61,12 @@ public class HandGunBullet : MonoBehaviour
                     moveSpeed *= 2f;
                     fireFromObjectTag = hit.collider.tag;
                     bulletLine.GetComponent<BulletLineScript>().addPoint();
+                    HitStop.Instance.Stop(0.15f);
                     break;
 
                 case "Enemy":
                     hit.collider.GetComponent<EnemyBase>().TakeDamageAction();
-                    //HitStop.Instance.Stop(0.1f);
+                    //HitStop.Instance.Stop(0.05f);
                     Destroy(gameObject);
                     break;
 
